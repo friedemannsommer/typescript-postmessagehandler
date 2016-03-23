@@ -53,6 +53,8 @@ class PostMessageHandler {
     public send(...data):boolean {
         var userData:string = PostMessageHandler.serialize(data);
 
+        userData = this.secret + userData;
+
         if (isFunction(this.target.postMessage)) {
             try {
                 this.target.postMessage(userData, this.targetOrigin);
