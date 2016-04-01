@@ -102,8 +102,10 @@ class PostMessageHandler {
     }
 
     private callListener(data:Array<any>):void {
-        for (let i = 0; i < this.messageListener.length; i++) {
-            this.messageListener[i].apply(undefined, data);
+        let index = this.messageListener.length >>> 0;
+        
+        while(--index > -1)
+            this.messageListener[index].apply(undefined, data);
         }
     }
 }
