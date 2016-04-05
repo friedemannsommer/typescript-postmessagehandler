@@ -1,4 +1,4 @@
-interface PostMessageEvent extends Event {
+interface PostMessageEvent extends MessageEvent {
     data:any
     message:any
     origin:string

@@ -2,6 +2,7 @@
 /// <reference path="./typings/JSON3.d.ts" />
 
 import bind from './lib/bind';
+import getType from './lib/get-type';
 import addEvent from './lib/add-event';
 import isFunction from './lib/is-function';
 import removeEvent from './lib/remove-event';
@@ -16,14 +17,14 @@ class PostMessageHandler {
     private secret:string;
     private target:Window;
     private targetOrigin:string;
-    private eventCallback:EventListener;
+    private eventCallback:(e:MessageEvent) => void;
     private static JSON:JSON3 = JSONLib.noConflict();
 
     public constructor(secret:string, target:Window, targetOrigin:string) {
         this.secret = secret;
         this.target = target;
         this.targetOrigin = targetOrigin;
-        this.eventCallback = <EventListener>bind(this.handleMessage, this);
+        this.eventCallback = bind(this.handleMessage, this);
     }
 
     public subscribe(fn:Function) {
@@ -38,7 +39,7 @@ class PostMessageHandler {
     }
 
     public unsubscribe(fn:Function) {
-        var index:number = this.messageListener.indexOf(fn);
+        let index:number = this.messageListener.indexOf(fn);
 
         if (index > -1) {
             this.messageListener.splice(index, 1);
@@ -51,14 +52,15 @@ class PostMessageHandler {
     }
 
     public send(...data):boolean {
-        var userData:string = PostMessageHandler.serialize(data);
-
+        let userData:string = PostMessageHandler.serialize(data);
         userData = this.secret + userData;
 
         if (isFunction(this.target.postMessage)) {
             try {
                 this.target.postMessage(userData, this.targetOrigin);
                 return true;
+            } catch (e:Error) {
+
             }
         }
 
@@ -85,26 +87,26 @@ class PostMessageHandler {
         return eventOrigin === this.targetOrigin && eventSource === this.target;
     }
 
-    private checkEventSecret(eventMessage:string):boolean {
-        return eventMessage.slice(0, this.secret.length) == this.secret;
-    }
-
     private handleMessage(e:PostMessageEvent):void {
-        var origin:string = e.origin || e.originalEvent.origin,
+        let origin:string = e.origin || e.originalEvent.origin,
             source:Window = e.source || e.srcElement,
-            dataKey:string = e.message ? 'message' : 'data';
+            dataKey:string = (e.message) ? 'message' : 'data',
+            secret:string = (getType(e[dataKey]) == 'string') ? e[dataKey].slice(0, this.secret.length) : '',
+            data:string = (getType(e[dataKey]) == 'string') ? e[dataKey].slice(this.secret.length) : '';
 
-        if (this.checkEventOrigin(origin, source) && typeof e[dataKey] === 'string') {
-            if (this.checkEventSecret(e[dataKey])) {
-                this.callListener(PostMessageHandler.parse(e[dataKey].slice(this.secret.length)));
+        // check if window references match
+        if (this.checkEventOrigin(origin, source)) {
+            // check if secret match
+            if (secret == this.secret) {
+                this.callListener(PostMessageHandler.parse(data));
             }
         }
     }
 
     private callListener(data:Array<any>):void {
         let index = this.messageListener.length >>> 0;
-        
-        while(--index > -1)
+
+        while (--index > -1) {
             this.messageListener[index].apply(undefined, data);
         }
     }
