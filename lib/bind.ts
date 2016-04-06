@@ -1,8 +1,9 @@
 import concat from './array-concat';
+import getType from './get-type';
 
 export default function (fn:Function, context:Object, ...givenArguments):Function {
-    if (typeof fn == 'function') {
-        if (typeof Function.prototype.bind == "function") {
+    if (getType(fn) == 'function') {
+        if (getType(Function.prototype.bind) == "function") {
             return Function.prototype.bind.apply(fn, concat([context], givenArguments));
         }
 

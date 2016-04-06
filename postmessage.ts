@@ -7,9 +7,7 @@ import addEvent from './lib/add-event';
 import isFunction from './lib/is-function';
 import removeEvent from './lib/remove-event';
 // import non typescript library
-import JSON3Lib = require('./lib/json3.js');
-import JSON3 = JSON_Module.JSON3;
-var JSONLib:JSON3 = JSON3Lib;
+import JSON3Lib = require('./lib/json3');
 
 class PostMessageHandler {
     private listenerRegistered:boolean = false;
@@ -17,14 +15,14 @@ class PostMessageHandler {
     private secret:string;
     private target:Window;
     private targetOrigin:string;
-    private eventCallback:(e:MessageEvent) => void;
-    private static JSON:JSON3 = JSONLib.noConflict();
+    private eventCallback:EventListener;
+    private static JSON:JSON3 = (<JSON3>JSON3Lib).noConflict();
 
     public constructor(secret:string, target:Window, targetOrigin:string) {
         this.secret = secret;
         this.target = target;
         this.targetOrigin = targetOrigin;
-        this.eventCallback = bind(this.handleMessage, this);
+        this.eventCallback = <EventListener>bind(this.handleMessage, this);
     }
 
     public subscribe(fn:Function) {
@@ -59,7 +57,7 @@ class PostMessageHandler {
             try {
                 this.target.postMessage(userData, this.targetOrigin);
                 return true;
-            } catch (e:Error) {
+            } catch (e) {
 
             }
         }
@@ -89,7 +87,7 @@ class PostMessageHandler {
 
     private handleMessage(e:PostMessageEvent):void {
         let origin:string = e.origin || e.originalEvent.origin,
-            source:Window = e.source || e.srcElement,
+            source:Window = e.source || e.originalEvent.source,
             dataKey:string = (e.message) ? 'message' : 'data',
             secret:string = (getType(e[dataKey]) == 'string') ? e[dataKey].slice(0, this.secret.length) : '',
             data:string = (getType(e[dataKey]) == 'string') ? e[dataKey].slice(this.secret.length) : '';
