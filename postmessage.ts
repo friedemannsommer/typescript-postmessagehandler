@@ -102,9 +102,10 @@ class PostMessageHandler {
     }
 
     private callListener(data:Array<any>):void {
-        let index = this.messageListener.length >>> 0;
+        let index:number = -1,
+            len:number = this.messageListener.length >>> 0;
 
-        while (--index > -1) {
+        while (++index < len) {
             this.messageListener[index].apply(undefined, data);
         }
     }
