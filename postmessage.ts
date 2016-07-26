@@ -7,7 +7,7 @@ import addEvent from './lib/add-event';
 import isFunction from './lib/is-function';
 import removeEvent from './lib/remove-event';
 // import non typescript library
-import JSON3Lib = require('./lib/json3');
+import JSON3Lib = require('./lib/json3.js');
 
 class PostMessageHandler {
     private listenerRegistered:boolean = false;
