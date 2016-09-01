@@ -1,7 +1,6 @@
 interface PostMessageEvent extends MessageEvent {
-    data:any
-    message:any
-    origin:string
-    source:Window
-    originalEvent:PostMessageEvent
+    data: any
+    message: any
+    origin: string
+    source: Window
 }

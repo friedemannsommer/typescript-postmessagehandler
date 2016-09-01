@@ -10,34 +10,34 @@ import removeEvent from './lib/remove-event';
 import JSON3Lib = require('./lib/json3');
 
 class PostMessageHandler {
-    private listenerRegistered:boolean = false;
-    private messageListener:Array<Function> = [];
-    private secret:string;
-    private target:Window;
-    private targetOrigin:string;
-    private eventCallback:EventListener;
-    private static JSON:JSON3 = (<JSON3>JSON3Lib).noConflict();
+    private listenerRegistered: boolean = false;
+    private messageListener: Array<Function> = [];
+    private secret: string;
+    private target: Window;
+    private targetOrigin: string;
+    private eventCallback: EventListener;
+    private static JSON: JSON3 = (<JSON3>JSON3Lib).noConflict();
 
-    public constructor(secret:string, target:Window, targetOrigin:string) {
+    public constructor(secret: string, target: Window, targetOrigin: string) {
         this.secret = secret;
         this.target = target;
         this.targetOrigin = targetOrigin;
         this.eventCallback = <EventListener>bind(this.handleMessage, this);
     }
 
-    public subscribe(fn:Function) {
+    public subscribe(func: Function) {
         if (!this.listenerRegistered) {
             this.listenerRegistered = true;
             PostMessageHandler.registerListener(this.eventCallback);
         }
 
-        if (isFunction(fn)) {
-            this.messageListener.push(fn);
+        if (isFunction(func)) {
+            this.messageListener.push(func);
         }
     }
 
-    public unsubscribe(fn:Function) {
-        let index:number = this.messageListener.indexOf(fn);
+    public unsubscribe(func: Function) {
+        let index: number = this.messageListener.indexOf(func);
 
         if (index > -1) {
             this.messageListener.splice(index, 1);
@@ -49,8 +49,8 @@ class PostMessageHandler {
         }
     }
 
-    public send(...data):boolean {
-        let userData:string = PostMessageHandler.serialize(data);
+    public send(...data: any[]): boolean {
+        let userData: string = PostMessageHandler.serialize(data);
         userData = this.secret + userData;
 
         if (isFunction(this.target.postMessage)) {
@@ -65,45 +65,43 @@ class PostMessageHandler {
         return false;
     }
 
-    private static registerListener(fn:EventListener):void {
-        addEvent(window, 'message', fn, false);
+    private static registerListener(func: EventListener): void {
+        addEvent(window, 'message', func, false);
     }
 
-    private static removeListener(fn:EventListener):void {
-        removeEvent(window, 'message', fn);
+    private static removeListener(func: EventListener): void {
+        removeEvent(window, 'message', func);
     }
 
-    private static parse(data:string):Array<any> {
+    private static parse(data: string): Array<any> {
         return PostMessageHandler.JSON.parse(data);
     }
 
-    private static serialize(data:Array<any>):string {
+    private static serialize(data: Array<any>): string {
         return PostMessageHandler.JSON.stringify(data);
     }
 
-    private checkEventOrigin(eventOrigin:string, eventSource:Window):boolean {
+    private checkEventOrigin(eventOrigin: string, eventSource: Window): boolean {
         return eventOrigin === this.targetOrigin && eventSource === this.target;
     }
 
-    private handleMessage(e:PostMessageEvent):void {
-        let origin:string = e.origin || e.originalEvent.origin,
-            source:Window = e.source || e.originalEvent.source,
-            dataKey:string = (e.message) ? 'message' : 'data',
-            secret:string = (getType(e[dataKey]) == 'string') ? e[dataKey].slice(0, this.secret.length) : '',
-            data:string = (getType(e[dataKey]) == 'string') ? e[dataKey].slice(this.secret.length) : '';
+    private handleMessage(event: PostMessageEvent): void {
+        const dataKey: string = (event.message) ? 'message' : 'data';
+        const secret: string = (getType(event[dataKey]) == 'string') ? event[dataKey].slice(0, this.secret.length) : '';
+        const data: string = (getType(event[dataKey]) == 'string') ? event[dataKey].slice(this.secret.length) : '';
 
         // check if window references match
-        if (this.checkEventOrigin(origin, source)) {
+        if (this.checkEventOrigin(event.origin, event.source)) {
             // check if secret match
-            if (secret == this.secret) {
+            if (secret === this.secret) {
                 this.callListener(PostMessageHandler.parse(data));
             }
         }
     }
 
-    private callListener(data:Array<any>):void {
-        let index:number = -1,
-            len:number = this.messageListener.length >>> 0;
+    private callListener(data: Array<any>): void {
+        const len: number = this.messageListener.length >>> 0;
+        let index: number = -1;
 
         while (++index < len) {
             this.messageListener[index].apply(undefined, data);
