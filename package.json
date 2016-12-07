@@ -18,6 +18,13 @@
     "postmessage",
     "handler"
   ],
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist/*",
+    "src/*"
+  ],
   "author": "Friedemann Sommer <friedemannsommer@yahoo.de>",
   "license": "MIT",
   "bugs": {
