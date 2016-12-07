@@ -1,3 +1,4 @@
+// tslint:disable-next-line
 interface EventTarget {
     // internet explorer implementations
     attachEvent(event: string, listener: EventListener): boolean

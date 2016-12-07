@@ -1,0 +1,50 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "target": "es5",
+        "newLine": "LF",
+        "locale": "en-us",
+        "charset": "utf-8",
+        "rootDir": "./src",
+        "module": "commonjs",
+        "reactNamespace": "React",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "noEmit": false,
+        "allowJs": false,
+        "listFiles": true,
+        "sourceMap": false,
+        "declaration": false,
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "removeComments": true,
+        "noEmitHelpers": false,
+        "noImplicitReturns": true,
+        "listEmittedFiles": false,
+        "strictNullChecks": false,
+        "preserveConstEnums": true,
+        "allowUnusedLabels": false,
+        "noUnusedParameters": false,
+        "skipDefaultLibCheck": false,
+        "noImplicitUseStrict": false,
+        "allowUnreachableCode": false,
+        "noFallthroughCasesInSwitch": false,
+        "allowSyntheticDefaultImports": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "files": [
+        "./src/index.ts"
+    ],
+    "exclude": [
+        ".git",
+        ".idea",
+        ".vscode",
+        ".gitignore",
+        "README",
+        "README.md",
+        "node_modules"
+    ]
+}

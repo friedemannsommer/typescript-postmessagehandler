@@ -1,0 +1,63 @@
+{
+    "extends": [
+        "tslint:recommended"
+    ],
+    "rulesDirectory": [
+        "src/typings"
+    ],
+    "rules": {
+        "curly": true,
+        "no-arg": true,
+        "no-console": [
+            true,
+            "log",
+            "error"
+        ],
+        "max-line-length": [
+            true,
+            140
+        ],
+        "no-debugger": true,
+        "no-empty": true,
+        "no-eval": true,
+        "radix": true,
+        "no-var-keyword": true,
+        "no-unused-expression": true,
+        "eofline": true,
+        "indent": [
+            true,
+            "spaces"
+        ],
+        "linebreak-style": [
+            true,
+            "LF"
+        ],
+        "trailing-comma": [
+            true,
+            {
+                "multiline": "never",
+                "singleline": "never"
+            }
+        ],
+        "quotemark": [
+            true,
+            "single",
+            "avoid-escape"
+        ],
+        "semicolon": [
+            true,
+            "never"
+        ],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type"
+        ],
+        "no-reference": false,
+        "variable-name": false,
+        "no-var-requires": true
+    }
+}
