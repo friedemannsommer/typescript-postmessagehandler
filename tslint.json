@@ -56,8 +56,8 @@
             "check-separator",
             "check-type"
         ],
-        "no-reference": false,
-        "variable-name": false,
+        "no-reference": true,
+        "variable-name": true,
         "no-var-requires": true
     }
 }

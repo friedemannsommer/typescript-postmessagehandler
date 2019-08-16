@@ -1,7 +1,5 @@
-// tslint:disable-next-line
-interface PostMessageEvent extends MessageEvent {
-    data: any
-    message: any
-    origin: string
+export interface IPostMessageEvent extends MessageEvent {
+    data: string
+    message: string
     source: Window
 }

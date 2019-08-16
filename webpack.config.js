@@ -1,8 +1,8 @@
 const path = require('path')
-const webpack = require('webpack')
 
 module.exports = {
     target: 'web',
+    mode: 'production',
     entry: {
         index: path.resolve(__dirname, 'src/index.ts')
     },
@@ -10,24 +10,46 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         libraryTarget: 'umd',
+        libraryExport: 'default',
         library: 'PostMessageHandler'
     },
     resolve: {
-        root: path.resolve(__dirname, 'src'),
-        modulesDirectories: ['node_modules'],
-        extensions: ['', '.js', '.ts']
+        modules: [
+            'node_modules'
+        ],
+        extensions: ['.js', '.ts']
     },
     module: {
-        loaders: [
+        rules: [
+            {
+                enforce: 'pre',
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'tslint-loader',
+                    options: {
+                        configFile: path.resolve(__dirname, './tslint.json'),
+                        emitErrors: true,
+                        failOnHint: true,
+                        typeCheck: true,
+                        fix: false
+                    }
+                }
+            },
             {
                 test: /\.ts$/,
-                exclude: /node_modules|\.d\.ts$/,
-                loader: 'ts-loader'
+                use: [
+                    {
+                        loader: 'awesome-typescript-loader',
+                        options: {
+                            useCache: true,
+                            reportFiles: [
+                                './src/**/*.ts'
+                            ]
+                        }
+                    }
+                ]
             }
         ]
-    },
-    plugins: [
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.OccurrenceOrderPlugin()
-    ]
+    }
 }
