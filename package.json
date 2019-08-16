@@ -24,7 +24,7 @@
     "dist/*",
     "src/*"
   ],
-  "author": "Friedemann Sommer <friedemannsommer@yahoo.de>",
+  "author": "Friedemann Sommer <contact@friedemannsommer.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/friedemannsommer/typescript-postmessagehandler/issues"
@@ -38,5 +38,7 @@
     "webpack": "4.39.2",
     "webpack-cli": "3.3.6"
   },
-  "dependencies": {}
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
 }
