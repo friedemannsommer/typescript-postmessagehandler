@@ -101,7 +101,7 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
     }
 
     private handleMessage(event: IPostMessageEvent): void {
-        const dataKey: string = (event.message) ? 'message' : 'data'
+        const dataKey = (event.message) ? 'message' : 'data'
         const secret: string = (getType(event[dataKey]) === 'string') ? event[dataKey].slice(0, this.secret.length) : ''
         const data: string = (getType(event[dataKey]) === 'string') ? event[dataKey].slice(this.secret.length) : ''
 
