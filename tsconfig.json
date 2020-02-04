@@ -6,6 +6,7 @@
         "locale": "en-us",
         "charset": "utf-8",
         "rootDir": "./src",
+        "baseUrl": "./",
         "module": "commonjs",
         "reactNamespace": "React",
         "moduleResolution": "node",
@@ -41,8 +42,9 @@
             "./node_modules/@types"
         ]
     },
-    "files": [
-        "./src/index.ts"
+    "compileOnSave": false,
+    "include": [
+        "./src/**/*.ts"
     ],
     "exclude": [
         ".git",
