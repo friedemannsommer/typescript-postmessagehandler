@@ -5,7 +5,7 @@ import isFunction from './lib/is-function'
 import removeEvent from './lib/remove-event'
 import { IPostMessageEvent } from './typings/PostMessageEvent'
 
-class PostMessageHandler {
+class PostMessageHandler<T extends unknown[] = unknown[]> {
     private static registerListener(func: EventListener): void {
         addEvent(window, 'message', func, false)
     }
@@ -14,7 +14,7 @@ class PostMessageHandler {
         removeEvent(window, 'message', func)
     }
 
-    private readonly messageListener: BindFn[] = []
+    private readonly messageListener: BindFn<T>[] = []
     private readonly secret: string
     private readonly target: MessageEventSource
     private readonly targetOrigin: string | undefined
@@ -22,6 +22,8 @@ class PostMessageHandler {
     private readonly isWindow: boolean
     private listenerRegistered: boolean = false
 
+    public constructor(secret: string, target: Window, targetOrigin: string)
+    public constructor(secret: string, target: MessagePort | ServiceWorker)
     public constructor(secret: string, target: MessageEventSource, targetOrigin?: string) {
         this.isWindow = (target as Window).self === target && (target as Window).window === target && typeof window.document === 'object'
 
@@ -35,7 +37,12 @@ class PostMessageHandler {
         this.eventCallback = bind(this.handleMessage, this) as EventListener
     }
 
-    public subscribe(func: BindFn) {
+    /**
+     * subscribe to message events
+     * @param func function which will be called if an message event has been dispatched
+     * @returns {Function} which can be called as a shorthand for calling `PostMessageHandler.unsubscribe`
+     */
+    public subscribe(func: BindFn<T>): () => void {
         if (!this.listenerRegistered) {
             this.listenerRegistered = true
             PostMessageHandler.registerListener(this.eventCallback)
@@ -44,9 +51,17 @@ class PostMessageHandler {
         if (isFunction(func)) {
             this.messageListener.push(func)
         }
+
+        return () => {
+            this.unsubscribe(func)
+        }
     }
 
-    public unsubscribe(func: BindFn) {
+    /**
+     * remove message event subscription
+     * @param func function which should be removed from the message event subscription
+     */
+    public unsubscribe(func: BindFn<T>): void {
         const index: number = this.messageListener.indexOf(func)
 
         if (index > -1) {
@@ -59,7 +74,11 @@ class PostMessageHandler {
         }
     }
 
-    public send(...data: unknown[]): boolean {
+    /**
+     * "send" the given data to the given target
+     * @param data arguments which should be passed onto the target (should be serializable)
+     */
+    public send(...data: T): boolean {
         if (isFunction(this.target.postMessage)) {
             try {
                 if (this.isWindow) {
@@ -95,7 +114,7 @@ class PostMessageHandler {
         }
     }
 
-    private callListener(data: unknown[]): void {
+    private callListener(data: T): void {
         const length: number = this.messageListener.length
         let index: number = -1
 
