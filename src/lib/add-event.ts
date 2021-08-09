@@ -7,7 +7,12 @@ declare global {
     }
 }
 
-export default function addEvent(element: EventTarget, type: string, listener: EventListener, capture: boolean): void {
+export default function addEvent(
+    element: EventTarget,
+    type: string,
+    listener: EventListener,
+    capture: boolean
+): void {
     if (supports(element, 'addEventListener')) {
         element.addEventListener(type, listener, capture)
     } else if (supports(element, 'attachEvent')) {

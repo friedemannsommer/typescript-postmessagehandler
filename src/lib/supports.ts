@@ -1,9 +1,12 @@
-export default function supports(object: any, property: string): boolean {
-    if (object !== null) {
+export default function supports(object: unknown, property: string): boolean {
+    if (object !== null && typeof object !== 'undefined') {
         try {
-            return property in object
+            return property in (object as Record<string, unknown>)
         } catch (e) {
-            return typeof object[property] !== 'undefined'
+            return (
+                typeof (object as Record<string, unknown>)[property] !==
+                'undefined'
+            )
         }
     }
 

@@ -20,7 +20,7 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
     private readonly targetOrigin: string | undefined
     private readonly eventCallback: EventListener
     private readonly isWindow: boolean
-    private listenerRegistered: boolean = false
+    private listenerRegistered = false
 
     public constructor(secret: string, target: Window, targetOrigin: string)
     public constructor(secret: string, target: MessagePort | ServiceWorker)
@@ -39,7 +39,7 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
 
     /**
      * subscribe to message events
-     * @param func function which will be called if an message event has been dispatched
+     * @param func function which will be called if a message event has been dispatched
      * @returns {Function} which can be called as a shorthand for calling `PostMessageHandler.unsubscribe`
      */
     public subscribe(func: BindFn<T>): () => void {
@@ -116,7 +116,7 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
 
     private callListener(data: T): void {
         const length: number = this.messageListener.length
-        let index: number = -1
+        let index = -1
 
         while (++index < length) {
             this.messageListener[index].apply(undefined, data)

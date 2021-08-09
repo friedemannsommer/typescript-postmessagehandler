@@ -1,1 +1,1 @@
-export default function supports(object: any, property: string): boolean;
+export default function supports(object: unknown, property: string): boolean;
