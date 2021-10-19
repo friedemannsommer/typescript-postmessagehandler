@@ -1,5 +1,5 @@
 import { BindFn } from './lib/bind';
-declare class PostMessageHandler<T extends unknown[] = unknown[]> {
+export default class PostMessageHandler<T extends unknown[] = unknown[]> {
     private static registerListener;
     private static removeListener;
     private readonly messageListener;
@@ -18,4 +18,3 @@ declare class PostMessageHandler<T extends unknown[] = unknown[]> {
     private handleMessage;
     private callListener;
 }
-export default PostMessageHandler;
