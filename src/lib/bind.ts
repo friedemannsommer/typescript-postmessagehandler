@@ -23,10 +23,7 @@ export default function bindFn<T extends unknown[] = unknown[]>(
         return givenArguments.length > 0
             ? (...localArguments: unknown[]) => {
                   return localArguments.length > 0
-                      ? fn.apply(
-                            context,
-                            givenArguments.concat(localArguments) as T
-                        )
+                      ? fn.apply(context, givenArguments.concat(localArguments) as T)
                       : fn.apply(context, givenArguments as T)
               }
             : (...localArguments: unknown[]) => {

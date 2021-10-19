@@ -7,11 +7,7 @@ declare global {
     }
 }
 
-export default function removeEvent(
-    element: EventTarget,
-    type: string,
-    listener: EventListener
-): void {
+export default function removeEvent(element: EventTarget, type: string, listener: EventListener): void {
     if (supports(element, 'removeEventListener')) {
         element.removeEventListener(type, listener)
     } else if (supports(element, 'detachEvent')) {

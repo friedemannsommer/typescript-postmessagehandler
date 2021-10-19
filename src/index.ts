@@ -5,7 +5,7 @@ import isFunction from './lib/is-function'
 import removeEvent from './lib/remove-event'
 import { IPostMessageEvent } from './typings/PostMessageEvent'
 
-class PostMessageHandler<T extends unknown[] = unknown[]> {
+export default class PostMessageHandler<T extends unknown[] = unknown[]> {
     private static registerListener(func: EventListener): void {
         addEvent(window, 'message', func, false)
     }
@@ -25,7 +25,10 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
     public constructor(secret: string, target: Window, targetOrigin: string)
     public constructor(secret: string, target: MessagePort | ServiceWorker)
     public constructor(secret: string, target: MessageEventSource, targetOrigin?: string) {
-        this.isWindow = (target as Window).self === target && (target as Window).window === target && typeof window.document === 'object'
+        this.isWindow =
+            (target as Window).self === target &&
+            (target as Window).window === target &&
+            typeof window.document === 'object'
 
         if (this.isWindow && getType(targetOrigin) !== 'string') {
             throw new Error('`target` is `window` like which requires an `targetOrigin`, but no `targetOrigin` is set')
@@ -82,10 +85,15 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
         if (isFunction(this.target.postMessage)) {
             try {
                 if (this.isWindow) {
-                    (this.target as Window).postMessage(this.secret + JSON.stringify(data), this.targetOrigin as string)
+                    // eslint-disable-next-line @typescript-eslint/no-extra-semi
+                    ;(this.target as Window).postMessage(
+                        this.secret + JSON.stringify(data),
+                        this.targetOrigin as string
+                    )
                     return true
                 } else {
-                    (this.target as MessagePort).postMessage(this.secret + JSON.stringify(data))
+                    // eslint-disable-next-line @typescript-eslint/no-extra-semi
+                    ;(this.target as MessagePort).postMessage(this.secret + JSON.stringify(data))
                     return true
                 }
             } catch (e) {
@@ -101,9 +109,9 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
     }
 
     private handleMessage(event: IPostMessageEvent): void {
-        const dataKey = (event.message) ? 'message' : 'data'
-        const secret: string = (getType(event[dataKey]) === 'string') ? event[dataKey].slice(0, this.secret.length) : ''
-        const data: string = (getType(event[dataKey]) === 'string') ? event[dataKey].slice(this.secret.length) : ''
+        const dataKey = event.message ? 'message' : 'data'
+        const secret: string = getType(event[dataKey]) === 'string' ? event[dataKey].slice(0, this.secret.length) : ''
+        const data: string = getType(event[dataKey]) === 'string' ? event[dataKey].slice(this.secret.length) : ''
 
         // check if window references match
         if (this.checkEventOrigin(event.origin, event.source)) {
@@ -123,5 +131,3 @@ class PostMessageHandler<T extends unknown[] = unknown[]> {
         }
     }
 }
-
-export default PostMessageHandler

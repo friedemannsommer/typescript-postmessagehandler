@@ -3,10 +3,7 @@ export default function supports(object: unknown, property: string): boolean {
         try {
             return property in (object as Record<string, unknown>)
         } catch (e) {
-            return (
-                typeof (object as Record<string, unknown>)[property] !==
-                'undefined'
-            )
+            return typeof (object as Record<string, unknown>)[property] !== 'undefined'
         }
     }
 
