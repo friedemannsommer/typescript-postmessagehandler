@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "npx webpack --progress --config ./webpack.config.js",
+    "check": "npx tsc --project tsconfig.json --noEmit",
     "fmt": "npx prettier -c src",
     "lint": "npx eslint -c .eslintrc.js src",
     "postbuild": "npm run fmt && npm run lint",
@@ -20,11 +21,7 @@
     "handler"
   ],
   "files": [
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "dist/*",
-    "src/*"
+    "dist/*"
   ],
   "author": "Friedemann Sommer <contact@friedemannsommer.com>",
   "license": "MIT",
