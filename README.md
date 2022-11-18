@@ -19,7 +19,7 @@ Full (IFrames, Windows, Tabs)
 * Safari 4+
 * Opera 10.1+
 
-Source: [Can I use](https://caniuse.com/#search=postMessage)
+Source: [Can I use](https://caniuse.com/mdn-api_window_postmessage)
 
 ## Example
 
