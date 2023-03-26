@@ -1,26 +1,18 @@
 import addEvent from './lib/add-event'
-import bind, { BindFn } from './lib/bind'
-import getType from './lib/get-type'
-import isFunction from './lib/is-function'
-import removeEvent from './lib/remove-event'
+import noop from './lib/noop'
 import { IPostMessageEvent } from './typings/PostMessageEvent'
 
+export type MessageListener<T extends unknown[] = unknown[]> = (...args: T) => void
+
 export default class PostMessageHandler<T extends unknown[] = unknown[]> {
-    private static registerListener(func: EventListener): void {
-        addEvent(window, 'message', func, false)
-    }
-
-    private static removeListener(func: EventListener): void {
-        removeEvent(window, 'message', func)
-    }
-
-    private readonly messageListener: BindFn<T>[] = []
+    private readonly messageListener: MessageListener<T>[] = []
     private readonly secret: string
     private readonly target: MessageEventSource
     private readonly targetOrigin: string | undefined
-    private readonly eventCallback: EventListener
+    private readonly eventCallback: (evt: MessageEvent) => void
     private readonly isWindow: boolean
     private listenerRegistered = false
+    private removeMessageListener: VoidFunction | undefined
 
     public constructor(secret: string, target: Window, targetOrigin: string)
     public constructor(secret: string, target: MessagePort | ServiceWorker)
@@ -30,103 +22,104 @@ export default class PostMessageHandler<T extends unknown[] = unknown[]> {
             (target as Window).window === target &&
             typeof window.document === 'object'
 
-        if (this.isWindow && getType(targetOrigin) !== 'string') {
+        if (this.isWindow && typeof targetOrigin !== 'string') {
             throw new Error('`target` is `window` like which requires an `targetOrigin`, but no `targetOrigin` is set')
         }
 
         this.targetOrigin = targetOrigin
         this.secret = secret
         this.target = target
-        this.eventCallback = bind(this.handleMessage, this) as EventListener
+        this.eventCallback = (evt: MessageEvent): void => {
+            this.handleMessage(evt as IPostMessageEvent)
+        }
     }
 
     /**
      * subscribe to message events
-     * @param func function which will be called if a message event has been dispatched
-     * @returns {Function} which can be called as a shorthand for calling `PostMessageHandler.unsubscribe`
+     * @param func function which will be called when an event has been received
+     * @returns {Function} function shorthand for calling `PostMessageHandler.unsubscribe`
      */
-    public subscribe(func: BindFn<T>): () => void {
+    public subscribe(func: MessageListener<T>): VoidFunction {
         if (!this.listenerRegistered) {
             this.listenerRegistered = true
-            PostMessageHandler.registerListener(this.eventCallback)
+            this.removeMessageListener = addEvent(this.target, 'message', this.eventCallback as EventListener, false)
         }
 
-        if (isFunction(func)) {
+        if (typeof func === 'function') {
             this.messageListener.push(func)
+
+            return (): void => {
+                this.unsubscribe(func)
+            }
         }
 
-        return () => {
-            this.unsubscribe(func)
-        }
+        return noop
     }
 
     /**
      * remove message event subscription
      * @param func function which should be removed from the message event subscription
      */
-    public unsubscribe(func: BindFn<T>): void {
-        const index: number = this.messageListener.indexOf(func)
+    public unsubscribe(func: MessageListener<T>): void {
+        const index = this.messageListener.indexOf(func)
 
-        if (index > -1) {
+        if (index !== -1) {
             this.messageListener.splice(index, 1)
         }
 
-        if (this.messageListener.length <= 0) {
-            PostMessageHandler.removeListener(this.eventCallback)
+        if (this.listenerRegistered && this.messageListener.length === 0) {
             this.listenerRegistered = false
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            this.removeMessageListener!()
         }
     }
 
     /**
-     * "send" the given data to the given target
-     * @param data arguments which should be passed onto the target (should be serializable)
+     * send the given data to the configured target
+     * @param data arguments which should be passed onto the target (must be serializable)
      */
     public send(...data: T): boolean {
-        if (isFunction(this.target.postMessage)) {
-            try {
-                if (this.isWindow) {
-                    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-                    ;(this.target as Window).postMessage(
-                        this.secret + JSON.stringify(data),
-                        this.targetOrigin as string
-                    )
-                    return true
-                } else {
-                    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-                    ;(this.target as MessagePort).postMessage(this.secret + JSON.stringify(data))
-                    return true
-                }
-            } catch (e) {
-                // silence is golden
+        try {
+            if (this.isWindow) {
+                // eslint-disable-next-line @typescript-eslint/no-extra-semi
+                ;(this.target as Window).postMessage(this.secret + JSON.stringify(data), this.targetOrigin as string)
+            } else {
+                // eslint-disable-next-line @typescript-eslint/no-extra-semi
+                ;(this.target as MessagePort).postMessage(this.secret + JSON.stringify(data))
             }
+
+            return true
+        } catch (e) {
+            return false
         }
-
-        return false
-    }
-
-    private checkEventOrigin(eventOrigin: string, eventSource: Window): boolean {
-        return eventOrigin === this.targetOrigin && eventSource === this.target
     }
 
     private handleMessage(event: IPostMessageEvent): void {
-        const dataKey = event.message ? 'message' : 'data'
-        const secret: string = getType(event[dataKey]) === 'string' ? event[dataKey].slice(0, this.secret.length) : ''
-        const data: string = getType(event[dataKey]) === 'string' ? event[dataKey].slice(this.secret.length) : ''
-
         // check if window references match
         if (this.checkEventOrigin(event.origin, event.source)) {
-            // check if secret match
+            const dataKey = event.message ? 'message' : 'data'
+
+            if (typeof event[dataKey] !== 'string') {
+                return
+            }
+
+            const secret = event[dataKey].slice(0, this.secret.length)
+
+            // check if received secret matches
             if (secret === this.secret) {
-                this.callListener(JSON.parse(data))
+                this.callListener(JSON.parse(event[dataKey].slice(this.secret.length)))
             }
         }
+    }
+
+    private checkEventOrigin(eventOrigin: string, eventSource: MessageEventSource): boolean {
+        return eventOrigin === this.targetOrigin && eventSource === this.target
     }
 
     private callListener(data: T): void {
         const length: number = this.messageListener.length
-        let index = -1
 
-        while (++index < length) {
+        for (let index = 0; index < length; index++) {
             this.messageListener[index].apply(undefined, data)
         }
     }

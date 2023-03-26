@@ -1,15 +1,37 @@
 import supports from './supports'
+import noop from './noop'
 
 declare global {
     interface EventTarget {
         attachEvent(event: string, listener: EventListener): boolean
+
+        detachEvent(even: string, listener: EventListener): boolean
     }
 }
 
-export default function addEvent(element: EventTarget, type: string, listener: EventListener, capture: boolean): void {
+export default function addEvent<T extends EventTarget>(
+    element: T,
+    type: string,
+    listener: Parameters<T['addEventListener']>[1],
+    capture: boolean
+): VoidFunction {
     if (supports(element, 'addEventListener')) {
         element.addEventListener(type, listener, capture)
-    } else if (supports(element, 'attachEvent')) {
-        element.attachEvent('on' + type, listener)
+
+        return (): void => {
+            element.removeEventListener(type, listener, capture)
+        }
     }
+
+    if (supports(element, 'attachEvent')) {
+        const eventName = 'on' + type
+
+        element.attachEvent(eventName, listener as EventListener)
+
+        return (): void => {
+            element.detachEvent(eventName, listener as EventListener)
+        }
+    }
+
+    return noop
 }
