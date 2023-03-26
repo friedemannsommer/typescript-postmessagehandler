@@ -30,13 +30,13 @@
   },
   "homepage": "https://github.com/friedemannsommer/typescript-postmessagehandler#readme",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "5.55.0",
-    "@typescript-eslint/parser": "5.55.0",
+    "@typescript-eslint/eslint-plugin": "5.56.0",
+    "@typescript-eslint/parser": "5.56.0",
     "eslint": "8.36.0",
-    "prettier": "2.8.4",
+    "prettier": "2.8.7",
     "ts-loader": "9.4.2",
     "typescript": "5.0.2",
-    "webpack": "5.76.2",
+    "webpack": "5.76.3",
     "webpack-cli": "5.0.1"
   }
 }
