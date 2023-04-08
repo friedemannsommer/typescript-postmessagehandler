@@ -28,12 +28,19 @@ Source: [Can I use](https://caniuse.com/mdn-api_window_postmessage)
  * https://app.example.com
  */
 import PostMessageHandler from 'typescript-postmessagehandler';
+
 // in this example we use a IFrame to communicate with
+const secret = 'my-secret-key';
 let iFrame: HTMLIFrameElement = document.createElement('iframe');
-iFrame.src = 'https://example.com';
+
+iFrame.src = 'https://example.com/#' + secret;
+
 document.appendChild(iFrame);
+
 // instantiate PostMessageHandler
-const messageHandler = new PostMessageHandler('my-secret-key', iFrame.contentWindow, 'https://example.com');
+const messageHandler = new PostMessageHandler(secret, iFrame.contentWindow, 'https://example.com');
+
+// send a message
 messageHandler.send('example data', 1337, ['array', 'values'], {key: 'value'});
 ```
 
@@ -42,8 +49,9 @@ messageHandler.send('example data', 1337, ['array', 'values'], {key: 'value'});
  * https://example.com
  */
 import PostMessageHandler from 'typescript-postmessagehandler';
+
 // instantiate PostMessageHandler
-const messageHandler = new PostMessageHandler('my-secret-key', window.parent, document.referrer);
+const messageHandler = new PostMessageHandler(window.location.hash, window.parent, document.referrer);
 
 // create PostMessage Listener
 function handlePostMessage(stringValue: string, numberValue: number, arrayValue: Array<string>, objectValue: Object) {
@@ -52,18 +60,4 @@ function handlePostMessage(stringValue: string, numberValue: number, arrayValue:
 
 // subscribe to PostMessages
 messageHandler.subscribe(handlePostMessage);
-```
-
-## API
-
-```typescript
-interface PostMessageHandler {
-    new(secret: string, target: MessageEventSource, origin?: string)
-
-    send(...data: Array<any>): boolean
-
-    subscribe(listener: Function): void
-
-    unsubscribe(listener: Function): void
-}
 ```

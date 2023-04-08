@@ -1,15 +1,13 @@
 import supports from './supports'
 import noop from './noop'
 
-declare global {
-    interface EventTarget {
-        attachEvent(event: string, listener: EventListener): boolean
+export interface LegacyEventTarget extends EventTarget {
+    attachEvent(event: string, listener: EventListener): boolean
 
-        detachEvent(even: string, listener: EventListener): boolean
-    }
+    detachEvent(even: string, listener: EventListener): boolean
 }
 
-export default function addEvent<T extends EventTarget>(
+export default function addEvent<T extends LegacyEventTarget>(
     element: T,
     type: string,
     listener: Parameters<T['addEventListener']>[1],

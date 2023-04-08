@@ -1,0 +1,80 @@
+name: publish docs
+
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout "gh-pages" branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
+      - name: upload current docs
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: ignore
+          name: current_documentation
+          path: docs
+          retention-days: 1
+
+  build:
+    needs: restore
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v3
+
+      - name: download current docs
+        uses: actions/download-artifact@v3
+        with:
+          name: current_documentation
+
+      - name: decompress docs
+        run: tar -xf documentation.tar ./docs -C ./docs
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          node-version: 16
+
+      - run: npm ci --no-fund --no-audit
+
+      - name: build documentation
+        run: npm run docs
+
+      - name: upload generated docs
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: new_documentation
+          path: docs
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: download new docs
+        uses: actions/download-artifact@v3
+        with:
+          name: new_documentation
+          path: generated_documentation
+
+      - name: publish to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: generated_documentation

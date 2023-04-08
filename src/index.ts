@@ -1,43 +1,73 @@
-import addEvent from './lib/add-event'
+import addEvent, { LegacyEventTarget } from './lib/add-event'
 import noop from './lib/noop'
-import { IPostMessageEvent } from './typings/PostMessageEvent'
+import { PostMessageEvent } from './typings/PostMessageEvent'
+import { TargetOriginMissingError } from './lib/error'
 
+/**
+ * Alias for a function which accepts `T`.
+ *
+ * @typeParam T - Event data
+ */
 export type MessageListener<T extends unknown[] = unknown[]> = (...args: T) => void
 
-export default class PostMessageHandler<T extends unknown[] = unknown[]> {
+/**
+ * Constructs a new message handler with the given `secret` and `target`
+ *
+ * @typeParam T - Event data
+ */
+export class PostMessageHandler<T extends unknown[] = unknown[]> {
     private readonly messageListener: MessageListener<T>[] = []
     private readonly secret: string
-    private readonly target: MessageEventSource
+    private readonly target: MessageEventSource & LegacyEventTarget
     private readonly targetOrigin: string | undefined
     private readonly eventCallback: (evt: MessageEvent) => void
     private readonly isWindow: boolean
     private listenerRegistered = false
     private removeMessageListener: VoidFunction | undefined
 
+    /**
+     * Constructs a new instance which will register event listeners for the given window.
+     *
+     * @param secret - A secret which should be unique to this instance, which both the sender and receiver must know.
+     * @param target - `Window` reference to communicate with.
+     * @param targetOrigin - Must be the origin of the given `Window`.
+     *
+     * @throws {@link TargetOriginMissingError}
+     * Thrown if `targetOrigin` isn't a `string`.
+     */
     public constructor(secret: string, target: Window, targetOrigin: string)
+
+    /**
+     * Constructs a new instance which will register event listeners for the given event target.
+     *
+     * @param secret - A secret which should be unique to this instance, which both the sender and receiver must know.
+     * @param target - Message event target to communicate with.
+     */
     public constructor(secret: string, target: MessagePort | ServiceWorker)
     public constructor(secret: string, target: MessageEventSource, targetOrigin?: string) {
         this.isWindow =
             (target as Window).self === target &&
             (target as Window).window === target &&
-            typeof window.document === 'object'
+            typeof target.document === 'object'
 
         if (this.isWindow && typeof targetOrigin !== 'string') {
-            throw new Error('`target` is `window` like which requires an `targetOrigin`, but no `targetOrigin` is set')
+            throw new TargetOriginMissingError(target as Window)
         }
 
         this.targetOrigin = targetOrigin
         this.secret = secret
-        this.target = target
+        this.target = target as MessageEventSource & LegacyEventTarget
         this.eventCallback = (evt: MessageEvent): void => {
-            this.handleMessage(evt as IPostMessageEvent)
+            this.handleMessage(evt as PostMessageEvent)
         }
     }
 
     /**
-     * subscribe to message events
-     * @param func function which will be called when an event has been received
-     * @returns {Function} function shorthand for calling `PostMessageHandler.unsubscribe`
+     * Adds the given function as listener for message events.
+     *
+     * @param func - A function which should be called when an event has been received.
+     * @returns A wrapper function for calling {@link PostMessageHandler.unsubscribe | unsubscribe}
+     * with the given `func` parameter.
      */
     public subscribe(func: MessageListener<T>): VoidFunction {
         if (!this.listenerRegistered) {
@@ -57,8 +87,9 @@ export default class PostMessageHandler<T extends unknown[] = unknown[]> {
     }
 
     /**
-     * remove message event subscription
-     * @param func function which should be removed from the message event subscription
+     * Remove the given function from message event handler list.
+     *
+     * @param func - A function which should be removed from the message event subscriptions.
      */
     public unsubscribe(func: MessageListener<T>): void {
         const index = this.messageListener.indexOf(func)
@@ -75,8 +106,11 @@ export default class PostMessageHandler<T extends unknown[] = unknown[]> {
     }
 
     /**
-     * send the given data to the configured target
-     * @param data arguments which should be passed onto the target (must be serializable)
+     * Send the given data to the configured target.
+     *
+     * @param data - Data which should be passed onto the target
+     * (must serializable {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description | see `JSON.stringify`}).
+     * @returns `true` if data could be sent, `false` otherwise.
      */
     public send(...data: T): boolean {
         try {
@@ -94,7 +128,7 @@ export default class PostMessageHandler<T extends unknown[] = unknown[]> {
         }
     }
 
-    private handleMessage(event: IPostMessageEvent): void {
+    private handleMessage(event: PostMessageEvent): void {
         // check if window references match
         if (this.checkEventOrigin(event.origin, event.source)) {
             const dataKey = event.message ? 'message' : 'data'
@@ -124,3 +158,7 @@ export default class PostMessageHandler<T extends unknown[] = unknown[]> {
         }
     }
 }
+
+export default PostMessageHandler
+
+export { PostMessageEvent, TargetOriginMissingError }
