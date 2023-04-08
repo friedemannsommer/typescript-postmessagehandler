@@ -19,6 +19,13 @@ jobs:
         with:
           ref: gh-pages
 
+      - name: create "docs" directory
+        run: |
+          if [ ! -d "docs" ]; then
+            mkdir -p docs
+            touch docs/include.txt
+          fi
+
       - name: upload current docs
         uses: actions/upload-artifact@v3
         with:
@@ -77,4 +84,5 @@ jobs:
       - name: publish to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          clean: true
           folder: generated_documentation
