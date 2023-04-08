@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   restore:
     concurrency: ci-${{ github.ref }}
@@ -20,33 +24,25 @@ jobs:
         with:
           ref: gh-pages
 
-      - name: create "docs" directory
+      - name: create empty index
         run: |
-          if [ ! -d "docs" ]; then
-            mkdir -p docs
-            touch docs/include.txt
+          if [ ! -f ".nojekyll" ]; then
+            echo "Prevent GitHub Pages from using Jekyll." > .nojekyll
           fi
 
       - name: upload current docs
         uses: actions/upload-artifact@v3
         with:
-          if-no-files-found: ignore
+          if-no-files-found: error
           name: current_documentation
-          path: docs
+          path: .
           retention-days: 1
 
   build:
-    needs: restore
-    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout source
         uses: actions/checkout@v3
-
-      - name: download current docs
-        uses: actions/download-artifact@v3
-        with:
-          name: current_documentation
 
       - uses: actions/setup-node@v3
         with:
@@ -67,13 +63,20 @@ jobs:
           retention-days: 1
 
   publish:
-    needs: build
-    concurrency: ci-${{ github.ref }}
+    needs:
+      - build
+      - restore
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v3
+
+      - name: download current docs
+        uses: actions/download-artifact@v3
+        with:
+          name: current_documentation
+          path: current_documentation
 
       - name: download new docs
         uses: actions/download-artifact@v3
@@ -81,8 +84,31 @@ jobs:
           name: new_documentation
           path: generated_documentation
 
+      - name: create version directory
+        if: github.ref_type == 'tag'
+        run: |
+          mkdir -p "new_documentation/${{ github.ref_name }}"
+          echo "<meta http-equiv=\"refresh\" content=\"0; url=${{ github.ref_name }}/\" />" > new_documentation/index.html
+
+          if [ ! -d "new_documentation/current" ]; then
+            mkdir -p "new_documentation/current"
+          fi
+
+          cp new_documentation/index.html new_documentation/current/index.html
+          rsync -ac --delete generated_documentation "new_documentation/${{ github.ref_name }}"
+
+      - name: create development directory
+        if: github.ref_type != 'tag'
+        run: |
+          if [ ! -d "new_documentation/development" ]; then
+            mkdir -p "new_documentation/development"
+          fi
+
+          rsync -ac --delete generated_documentation "new_documentation/development"
+
       - name: publish to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          branch: gh-pages
           clean: true
-          folder: generated_documentation
+          folder: new_documentation
