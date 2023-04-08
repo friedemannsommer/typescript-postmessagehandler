@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   restore:
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout "gh-pages" branch
@@ -36,6 +37,7 @@ jobs:
 
   build:
     needs: restore
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout source
@@ -45,9 +47,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: current_documentation
-
-      - name: decompress docs
-        run: tar -xf documentation.tar ./docs -C ./docs
 
       - uses: actions/setup-node@v3
         with:
@@ -69,6 +68,7 @@ jobs:
 
   publish:
     needs: build
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
