@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: new_documentation
+          name: generated_documentation
           path: docs
           retention-days: 1
 
@@ -81,12 +81,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: current_documentation
-          path: current_documentation
+          path: new_documentation
 
       - name: download new docs
         uses: actions/download-artifact@v3
         with:
-          name: new_documentation
+          name: generated_documentation
           path: generated_documentation
 
       - name: create version directory
@@ -99,7 +99,7 @@ jobs:
             mkdir -p "new_documentation/current"
           fi
 
-          cp new_documentation/index.html new_documentation/current/index.html
+          echo "<meta http-equiv=\"refresh\" content=\"0; url=${{ github.ref_name }}/\" />" > new_documentation/current/index.html
           rsync -ac --delete generated_documentation/ "new_documentation/${{ github.ref_name }}"
 
       - name: create development directory
@@ -109,7 +109,7 @@ jobs:
             mkdir -p "new_documentation/development"
           fi
 
-          if [ ! -f "current_documentation/index.html" ]; then
+          if [ ! -f "new_documentation/index.html" ]; then
             echo "<meta http-equiv=\"refresh\" content=\"0; url=development/\" />" > new_documentation/index.html
           fi
 
