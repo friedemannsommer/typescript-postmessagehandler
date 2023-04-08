@@ -11,8 +11,7 @@
   "out": "docs",
   "plugin": [
     "@mxssfd/typedoc-theme",
-    "typedoc-plugin-mdn-links",
-    "typedoc-plugin-versions"
+    "typedoc-plugin-mdn-links"
   ],
   "theme": "my-theme"
 }
