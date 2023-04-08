@@ -4,10 +4,9 @@
   "entryPoints": [
     "src/index.ts"
   ],
-  "githubPages": true,
+  "githubPages": false,
   "htmlLang": "en",
-  "includeVersion": true,
-  "name": "TypeScript PostMessage",
+  "name": "TypeScript PostMessage handler",
   "out": "docs",
   "plugin": [
     "@mxssfd/typedoc-theme",
