@@ -99,7 +99,7 @@ jobs:
             mkdir -p "new_documentation/current"
           fi
 
-          echo "<meta http-equiv=\"refresh\" content=\"0; url=${{ github.ref_name }}/\" />" > new_documentation/current/index.html
+          echo "<meta http-equiv=\"refresh\" content=\"0; url=../${{ github.ref_name }}/\" />" > new_documentation/current/index.html
           rsync -ac --delete generated_documentation/ "new_documentation/${{ github.ref_name }}"
 
       - name: create development directory
