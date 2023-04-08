@@ -2,6 +2,11 @@
 
 Simply implements postMessage in Typescript
 
+## Documentation
+
+You can find the API documentation
+here: [friedemannsommer.github.io/typescript-postmessagehandler](https://friedemannsommer.github.io/typescript-postmessagehandler/stable/)
+
 ## Compatibility
 
 **NO** fallback for older Browsers!
@@ -23,6 +28,8 @@ Source: [Can I use](https://caniuse.com/mdn-api_window_postmessage)
 
 ## Example
 
+### Sender
+
 ```typescript
 /**
  * https://app.example.com
@@ -43,6 +50,8 @@ const messageHandler = new PostMessageHandler(secret, iFrame.contentWindow, 'htt
 // send a message
 messageHandler.send('example data', 1337, ['array', 'values'], {key: 'value'});
 ```
+
+### Receiver
 
 ```typescript
 /**
