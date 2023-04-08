@@ -60,7 +60,7 @@ messageHandler.send('example data', 1337, ['array', 'values'], {key: 'value'});
 import PostMessageHandler from 'typescript-postmessagehandler';
 
 // instantiate PostMessageHandler
-const messageHandler = new PostMessageHandler(window.location.hash, window.parent, document.referrer);
+const messageHandler = new PostMessageHandler(window.location.hash.slice(1), window.parent, document.referrer);
 
 // create PostMessage Listener
 function handlePostMessage(stringValue: string, numberValue: number, arrayValue: Array<string>, objectValue: Object) {
