@@ -5,7 +5,7 @@ Simply implements postMessage in Typescript
 ## Documentation
 
 You can find the API documentation
-here: [friedemannsommer.github.io/typescript-postmessagehandler](https://friedemannsommer.github.io/typescript-postmessagehandler/stable/)
+here: [friedemannsommer.github.io/typescript-postmessagehandler](https://friedemannsommer.github.io/typescript-postmessagehandler/)
 
 ## Compatibility
 
