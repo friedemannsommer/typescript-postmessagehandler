@@ -95,7 +95,7 @@ jobs:
           fi
 
           cp new_documentation/index.html new_documentation/current/index.html
-          rsync -ac --delete generated_documentation "new_documentation/${{ github.ref_name }}"
+          rsync -ac --delete generated_documentation/ "new_documentation/${{ github.ref_name }}"
 
       - name: create development directory
         if: github.ref_type != 'tag'
@@ -104,7 +104,11 @@ jobs:
             mkdir -p "new_documentation/development"
           fi
 
-          rsync -ac --delete generated_documentation "new_documentation/development"
+          if [ ! -f "current_documentation/index.html" ]; then
+            echo "<meta http-equiv=\"refresh\" content=\"0; url=development/\" />" > new_documentation/index.html
+          fi
+
+          rsync -ac --delete generated_documentation/ "new_documentation/development"
 
       - name: publish to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
