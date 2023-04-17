@@ -58,7 +58,7 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
         this.secret = secret
         this.target = target as MessageEventSource & LegacyEventTarget
         this.eventCallback = (evt: MessageEvent): void => {
-            this.handleMessage(evt as PostMessageEvent)
+            this.handleMessage(evt)
         }
     }
 
@@ -128,20 +128,20 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
         }
     }
 
-    private handleMessage(event: PostMessageEvent): void {
+    private handleMessage(event: MessageEvent): void {
         // check if window references match
-        if (this.checkEventOrigin(event.origin, event.source)) {
-            const dataKey = event.message ? 'message' : 'data'
+        if (this.checkEventOrigin(event.origin, (event as PostMessageEvent).source)) {
+            const dataKey = (event as PostMessageEvent).message ? 'message' : 'data'
 
-            if (typeof event[dataKey] !== 'string') {
+            if (typeof (event as PostMessageEvent)[dataKey] !== 'string') {
                 return
             }
 
-            const secret = event[dataKey].slice(0, this.secret.length)
+            const secret = (event as PostMessageEvent)[dataKey].slice(0, this.secret.length)
 
             // check if received secret matches
             if (secret === this.secret) {
-                this.callListener(JSON.parse(event[dataKey].slice(this.secret.length)))
+                this.callListener(JSON.parse((event as PostMessageEvent)[dataKey].slice(this.secret.length)))
             }
         }
     }
@@ -161,4 +161,4 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
 
 export default PostMessageHandler
 
-export { PostMessageEvent, TargetOriginMissingError }
+export { TargetOriginMissingError }

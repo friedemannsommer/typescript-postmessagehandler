@@ -1,5 +1,6 @@
+import { TargetOriginMissingError } from './lib/error';
 export type MessageListener<T extends unknown[] = unknown[]> = (...args: T) => void;
-export default class PostMessageHandler<T extends unknown[] = unknown[]> {
+export declare class PostMessageHandler<T extends unknown[] = unknown[]> {
     private readonly messageListener;
     private readonly secret;
     private readonly target;
@@ -17,3 +18,5 @@ export default class PostMessageHandler<T extends unknown[] = unknown[]> {
     private checkEventOrigin;
     private callListener;
 }
+export default PostMessageHandler;
+export { TargetOriginMissingError };
