@@ -13,7 +13,6 @@
         "jsx": "react",
         "listEmittedFiles": false,
         "listFiles": false,
-        "locale": "en-us",
         "module": "commonjs",
         "moduleResolution": "node",
         "newLine": "LF",
