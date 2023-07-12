@@ -109,7 +109,7 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
      * Send the given data to the configured target.
      *
      * @param data - Data which should be passed onto the target
-     * (must serializable {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description | see `JSON.stringify`}).
+     * (must be serializable {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description | see `JSON.stringify`}).
      * @returns `true` if data could be sent, `false` otherwise.
      */
     public send(...data: T): boolean {
