@@ -115,10 +115,10 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
     public send(...data: T): boolean {
         try {
             if (this.isWindow) {
-                // eslint-disable-next-line @typescript-eslint/no-extra-semi
+                // eslint-disable-next-line no-extra-semi
                 ;(this.target as Window).postMessage(this.secret + JSON.stringify(data), this.targetOrigin as string)
             } else {
-                // eslint-disable-next-line @typescript-eslint/no-extra-semi
+                // eslint-disable-next-line no-extra-semi
                 ;(this.target as MessagePort).postMessage(this.secret + JSON.stringify(data))
             }
 
