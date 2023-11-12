@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           cache: 'npm'
-          node-version: 16
+          node-version: 20
       - run: npm ci --no-fund --no-audit
       - name: formatting
         run: npm run fmt
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           cache: 'npm'
-          node-version: 16
+          node-version: 20
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci --no-fund --no-audit
       - run: npm run build
