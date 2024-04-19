@@ -26,8 +26,9 @@ jobs:
     needs:
       - check
     permissions:
-      contents: read
+      contents: write
       id-token: write
+      pull-requests: write
     runs-on: ubuntu-latest
     if: github.repository_owner == 'friedemannsommer'
     concurrency: '${{ github.workflow }}-${{ github.ref }}'
