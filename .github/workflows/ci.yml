@@ -34,7 +34,7 @@ jobs:
       id-token: write
       pull-requests: write
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'friedemannsommer'
+    if: github.repository_owner == 'friedemannsommer' && github.ref_name == 'main'
     concurrency: '${{ github.workflow }}-${{ github.ref }}'
     steps:
       - uses: actions/checkout@v4.1.1
