@@ -9,7 +9,6 @@
     "docs": "typedoc",
     "fmt": "prettier -c src",
     "lint": "eslint -c .eslintrc.js src",
-    "postbuild": "npm run fmt && npm run lint",
     "test": "echo \"Error: no tests implemented\" && exit 1"
   },
   "repository": {
