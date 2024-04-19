@@ -1,0 +1,9 @@
+{
+  "access": "public",
+  "baseBranch": "main",
+  "changelog": ["@changesets/changelog-github", { "repo": "friedemannsommer/typescript-postmessagehandler" }],
+  "commit": false,
+  "ignore": [],
+  "linked": [],
+  "updateInternalDependencies": "patch"
+}

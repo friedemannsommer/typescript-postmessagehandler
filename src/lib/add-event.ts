@@ -1,5 +1,5 @@
-import supports from './supports'
-import noop from './noop'
+import noop from './noop.js'
+import supports from './supports.js'
 
 export interface LegacyEventTarget extends EventTarget {
     attachEvent(event: string, listener: EventListener): boolean
@@ -22,7 +22,7 @@ export default function addEvent<T extends LegacyEventTarget>(
     }
 
     if (supports(element, 'attachEvent')) {
-        const eventName = 'on' + type
+        const eventName = `on${type}`
 
         element.attachEvent(eventName, listener as EventListener)
 

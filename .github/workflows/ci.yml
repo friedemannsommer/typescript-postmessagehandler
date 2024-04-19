@@ -2,49 +2,49 @@ name: CI
 
 on:
   push:
-    branches:
-      - '*'
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-  pull_request: null
+  pull_request:
 
 permissions:
   contents: read
 
 jobs:
   check:
+    name: Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/setup-node@v4.0.2
         with:
           cache: 'npm'
           node-version: 20
       - run: npm ci --no-fund --no-audit
-      - name: formatting
-        run: npm run fmt
-      - name: lint
-        run: npm run lint
-      - name: typescript check
-        run: npm run check
+      - name: Run checks
+        run: npm run check:ci
 
-  publish:
+  release:
+    name: Release
     needs:
       - check
     permissions:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/')
+    if: github.repository_owner == 'friedemannsommer'
+    concurrency: '${{ github.workflow }}-${{ github.ref }}'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/setup-node@v4.0.2
         with:
           cache: 'npm'
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci --no-fund --no-audit
-      - run: npm run build
-      - run: npm publish --verbose --provenance
+      - name: Create release PR or publish
+        uses: changesets/action@1.4.7
+        with:
+          title: 'ci(changesets): package release'
+          commit: 'ci(changesets): version package'
+          publish: npm run release
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

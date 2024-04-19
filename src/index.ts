@@ -1,7 +1,7 @@
-import addEvent, { LegacyEventTarget } from './lib/add-event'
-import noop from './lib/noop'
-import { PostMessageEvent } from './typings/PostMessageEvent'
-import { TargetOriginMissingError } from './lib/error'
+import addEvent, { type LegacyEventTarget } from './lib/add-event.js'
+import { TargetOriginMissingError } from './lib/error.js'
+import noop from './lib/noop.js'
+import type { PostMessageEvent } from './typings/PostMessageEvent.js'
 
 /**
  * Alias for a function which accepts `T`.
@@ -22,7 +22,6 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
     private readonly targetOrigin: string | undefined
     private readonly eventCallback: (evt: MessageEvent) => void
     private readonly isWindow: boolean
-    private listenerRegistered = false
     private removeMessageListener: VoidFunction | undefined
 
     /**
@@ -70,8 +69,7 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
      * with the given `func` parameter.
      */
     public subscribe(func: MessageListener<T>): VoidFunction {
-        if (!this.listenerRegistered) {
-            this.listenerRegistered = true
+        if (this.removeMessageListener === undefined) {
             this.removeMessageListener = addEvent(this.target, 'message', this.eventCallback as EventListener, false)
         }
 
@@ -87,7 +85,7 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
     }
 
     /**
-     * Remove the given function from message event handler list.
+     * Remove the given function from the message event handler list.
      *
      * @param func - A function which should be removed from the message event subscriptions.
      */
@@ -98,10 +96,8 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
             this.messageListener.splice(index, 1)
         }
 
-        if (this.listenerRegistered && this.messageListener.length === 0) {
-            this.listenerRegistered = false
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this.removeMessageListener!()
+        if (this.removeMessageListener !== undefined && this.messageListener.length === 0) {
+            this.removeMessageListener()
         }
     }
 
