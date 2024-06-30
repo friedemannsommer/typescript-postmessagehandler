@@ -10,7 +10,7 @@
         "@changesets/cli": "2.27.6",
         "@mxssfd/typedoc-theme": "1.1.6",
         "typedoc": "0.26.3",
-        "typedoc-plugin-mdn-links": "3.2.1",
+        "typedoc-plugin-mdn-links": "3.2.2",
         "typescript": "5.4.5",
         "unbuild": "2.0.0"
     },
