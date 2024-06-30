@@ -5,7 +5,7 @@
     "src/index.ts"
   ],
   "githubPages": false,
-  "htmlLang": "en",
+  "lang": "en",
   "name": "TypeScript PostMessage handler",
   "out": "docs",
   "plugin": [
