@@ -16,7 +16,7 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4.2.2
       - uses: actions/setup-node@v4.0.4
         with:
           cache: 'npm'
@@ -37,7 +37,7 @@ jobs:
     if: github.repository_owner == 'friedemannsommer' && github.ref_name == 'main'
     concurrency: '${{ github.workflow }}-${{ github.ref }}'
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4.2.2
       - uses: actions/setup-node@v4.0.4
         with:
           cache: 'npm'
@@ -45,7 +45,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci --no-fund --no-audit
       - name: Create release PR or publish
-        uses: changesets/action@v1.4.8
+        uses: changesets/action@v1.4.9
         with:
           title: 'ci(changesets): package release'
           commit: 'ci(changesets): version package'
