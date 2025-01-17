@@ -12,7 +12,7 @@
         "typedoc": "0.26.11",
         "typedoc-plugin-mdn-links": "4.0.4",
         "typescript": "5.6.3",
-        "unbuild": "2.0.0"
+        "unbuild": "3.3.1"
     },
     "exports": {
         ".": {
