@@ -7,12 +7,12 @@
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@changesets/changelog-github": "0.5.0",
-        "@changesets/cli": "2.27.10",
-        "@mxssfd/typedoc-theme": "1.1.7",
-        "typedoc": "0.26.11",
-        "typedoc-plugin-mdn-links": "4.0.4",
-        "typescript": "5.6.3",
-        "unbuild": "2.0.0"
+        "@changesets/cli": "2.27.11",
+        "typedoc": "0.27.6",
+        "typedoc-github-theme": "0.2.1",
+        "typedoc-plugin-mdn-links": "4.0.9",
+        "typescript": "5.7.3",
+        "unbuild": "3.3.1"
     },
     "exports": {
         ".": {
