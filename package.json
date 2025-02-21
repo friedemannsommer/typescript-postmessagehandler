@@ -7,7 +7,7 @@
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@changesets/changelog-github": "0.5.0",
-        "@changesets/cli": "2.27.12",
+        "@changesets/cli": "2.28.1",
         "typedoc": "0.27.6",
         "typedoc-github-theme": "0.2.1",
         "typedoc-plugin-mdn-links": "4.0.11",
