@@ -12,7 +12,7 @@
         "typedoc-github-theme": "0.2.1",
         "typedoc-plugin-mdn-links": "4.0.13",
         "typescript": "5.7.3",
-        "unbuild": "3.3.1"
+        "unbuild": "3.5.0"
     },
     "exports": {
         ".": {
