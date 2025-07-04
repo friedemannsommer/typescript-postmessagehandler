@@ -119,7 +119,7 @@ export class PostMessageHandler<T extends unknown[] = unknown[]> {
             }
 
             return true
-        } catch (e) {
+        } catch (_e) {
             return false
         }
     }
