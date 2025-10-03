@@ -11,7 +11,7 @@
         "typedoc": "0.28.7",
         "typedoc-github-theme": "0.3.0",
         "typedoc-plugin-mdn-links": "5.0.2",
-        "typescript": "5.8.3",
+        "typescript": "5.9.3",
         "unbuild": "3.5.0"
     },
     "exports": {
